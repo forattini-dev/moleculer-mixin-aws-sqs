@@ -46,3 +46,65 @@ module.exports = {
   },
 };
 ```
+
+## Usage
+
+### Consumer
+
+```javascript
+// consumer.service.js
+const SqsMixin = require("../mixins/aws-sqs.mixin");
+
+const {
+  AWS_SQS_LEADS_NEW = "https://sqs.region.amazonaws.com/accountid/leads_new",
+} = process.env;
+
+module.exports = {
+  name: "leads-queue",
+  mixins: [SqsMixin],
+
+  settings: {
+    aws: {
+      sqs: {
+        prefetch: 100,
+      },
+    },
+  },
+
+  queues: {
+    async [AWS_SQS_LEADS_NEW](message) {
+      let { Body } = message;
+      const { MessageBody } = JSON.parse(Body);
+      await this.broker.call("leads.create", MessageBody);
+    },
+  },
+
+  actions: {
+    async newLead(ctx) {
+      await this.actions.sendMessage({
+        queue: AWS_SQS_LEADS_NEW,
+        body: JSON.stringify(ctx.params),
+      });
+    },
+  },
+};
+```
+
+### Producer
+
+```javascript
+// producer.service.js
+module.exports = {
+  name: "producer",
+
+  actions: {
+    async createNewLead(ctx) {
+      await ctx.call("leads-queue.newLead", {
+        a: 1,
+        b: "2",
+        c: true,
+      });
+    },
+  },
+};
+```

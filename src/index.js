@@ -41,7 +41,7 @@ module.exports = {
 
     this.awsSqsClient = new AWS.SQS({
       ...clientConfig,
-      
+
       httpOptions: {
         agent: new https.Agent({
           keepAlive: true,
@@ -57,57 +57,60 @@ module.exports = {
       },
     } = this.settings;
 
-    Object.entries(this.schema.queues)
-      .forEach(([key, value]) => {
-        this.activeQueues[key] = new Array(prefetch < 10 ? 1 : Math.ceil(prefetch/10))
-          .fill(0)
-          .map(() => {
-            let consumer = Consumer.create({
-              queueUrl: key,
-              batchSize: 10,
-              sqs: this.awsSqsClient,
-              handleMessage: value.bind(this),
-              visibilityTimeout: 2 * 60,
-              ...consumerConfig,
-            });
+    Object.entries(this.schema.queues).forEach(([key, value]) => {
+      this.activeQueues[key] = new Array(
+        prefetch < 10 ? 1 : Math.ceil(prefetch / 10)
+      )
+        .fill(0)
+        .map(() => {
+          let consumer = Consumer.create({
+            queueUrl: key,
+            batchSize: 10,
+            sqs: this.awsSqsClient,
+            handleMessage: value.bind(this),
+            visibilityTimeout: 2 * 60,
+            ...consumerConfig,
+          });
 
-            consumer = this.setupEvents(consumer);
-            consumer.start();
-          })
-      });
+          consumer = this.setupEvents(consumer);
+          consumer.start();
+        });
+    });
   },
 
   actions: {
-
     sendMessage: {
       params: {
-        queue: 'string',
-        body: 'string',
-        options: 'object',
+        queue: "string",
+        body: "string",
+        options: "object",
       },
 
-      async handler (ctx) {
-        const { queue, body, options } = ctx.params
+      async handler(ctx) {
+        const { queue, body, options = {} } = ctx.params;
 
         const params = {
-         DelaySeconds: 2,
-         MessageBody: body,
-         QueueUrl: queue,
-         ...options
-       }
+          DelaySeconds: 2,
+          MessageBody: body,
+          QueueUrl: queue,
+          ...options,
+        };
 
-       return this.awsSqsClient.sendMessage(params).promise()
-      }
+        return this.awsSqsClient.sendMessage(params).promise();
+      },
     },
-    
   },
 
   methods: {
     setupEvents(consumer) {
       consumer.on("empty", () => this.logger.warn(`SQS is empty`));
       consumer.on("error", (err) => this.logger.error(`SQS error`, err));
-      consumer.on("timeout_error", (err) => this.logger.error(`SQS timeout`, err));
-      consumer.on("processing_error", (err) => this.logger.error(`SQS processing error`, err));
+      consumer.on("timeout_error", (err) =>
+        this.logger.error(`SQS timeout`, err)
+      );
+      consumer.on("processing_error", (err) =>
+        this.logger.error(`SQS processing error`, err)
+      );
 
       consumer.on("stopped", () => {
         this.logger.warn(`SQS stopped`);
