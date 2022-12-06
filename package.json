@@ -2,13 +2,10 @@
   "name": "moleculer-mixin-aqs-sqs",
   "version": "1.0.1",
   "main": "src/index.js",
-  "license": "MIT",
+  "license": "UNLICENSE",
   "homepage": "https://github.com/forattini-dev/moleculer-mixin-aws-sqs#readme",
-  "description": "",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
+  "description": "Moleculer Mixin for AWS SQS",
+  "author": "filipeforattini",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/forattini-dev/moleculer-mixin-aws-sqs.git"
@@ -19,5 +16,12 @@
   "dependencies": {
     "aws-sdk": "^2.1268.0",
     "sqs-consumer": "^5.7.0"
-  }
+  },
+  "devDependencies": {},
+  "keywords": [
+    "moleculer",
+    "mixin",
+    "aws",
+    "sqs"
+  ]
 }
