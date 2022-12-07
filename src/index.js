@@ -12,7 +12,7 @@ module.exports = {
       secretAccessKey: null,
 
       sqs: {
-        prefetch: 20,
+        prefetch: 5,
         clientConfig: {},
         consumerConfig: {},
       },
@@ -56,26 +56,29 @@ module.exports = {
         sqs: { prefetch, consumerConfig },
       },
     } = this.settings;
+    
+    for (const [key, value] of this.schema.queues) {
+      this.activeQueues[key] = []
 
-    Object.entries(this.schema.queues).forEach(([key, value]) => {
-      this.activeQueues[key] = new Array(
-        prefetch < 10 ? 1 : Math.ceil(prefetch / 10)
-      )
-        .fill(0)
-        .map(() => {
-          let consumer = Consumer.create({
-            queueUrl: key,
-            batchSize: 10,
-            sqs: this.awsSqsClient,
-            handleMessage: value.bind(this),
-            visibilityTimeout: 2 * 60,
-            ...consumerConfig,
-          });
-
-          consumer = this.setupEvents(consumer);
-          consumer.start();
+      for (let i = 0; i < Math.ceil(prefetch); i++) {
+        const batchSize = prefetch - (10 * i) > 10 ? 10 : prefetch - (10 * i)
+        if (batchSize <= 0) break
+        
+        let consumer = Consumer.create({
+          batchSize,
+          queueUrl: key,
+          sqs: this.awsSqsClient,
+          visibilityTimeout: 2 * 60,
+          handleMessage: value.bind(this),
+          ...consumerConfig,
         });
-    });
+  
+        consumer = this.setupEvents(consumer);
+        consumer.start();        
+        
+        this.activeQueues[key].push(consumer)
+      }
+    }
   },
 
   actions: {

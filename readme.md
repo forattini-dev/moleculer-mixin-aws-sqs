@@ -32,14 +32,14 @@ module.exports = {
       region: "us-east-1", // default
 
       sqs: {
-        prefetch: 20, // default
+        prefetch: 5, // default
 
         // configs you may want to pass to AWS.SQS
         clientConfig: {},
 
         // configs you may want to pass to sqs-consumer
         consumerConfig: {
-          visibilityTimeout: 2 * 60, // default
+          visibilityTimeout: 2 * 60, // default, in seconds
         },
       },
     },
@@ -66,7 +66,7 @@ module.exports = {
   settings: {
     aws: {
       sqs: {
-        prefetch: 100,
+        prefetch: 45,
       },
     },
   },
