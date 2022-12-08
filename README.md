@@ -4,7 +4,9 @@
 
 ```bash
 $ npm install moleculer-mixin-aws-sqs
+
 # or
+
 $ yarn add moleculer-mixin-aws-sqs
 ```
 
