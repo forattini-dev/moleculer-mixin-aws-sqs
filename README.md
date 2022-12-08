@@ -74,7 +74,7 @@ module.exports = {
   queues: {
     async [AWS_SQS_LEADS_NEW](message) {
       let { Body } = message;
-      const { MessageBody } = JSON.parse(Body);
+      const MessageBody = JSON.parse(Body);
       await this.broker.call("leads.create", MessageBody);
     },
   },
