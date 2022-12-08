@@ -1,5 +1,5 @@
 {
-  "name": "moleculer-mixin-aqs-sqs",
+  "name": "moleculer-mixin-aws-sqs",
   "version": "1.0.3",
   "main": "src/index.js",
   "license": "UNLICENSE",
