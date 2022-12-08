@@ -1,6 +1,6 @@
 {
   "name": "moleculer-mixin-aws-sqs",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "src/index.js",
   "license": "UNLICENSE",
   "homepage": "https://github.com/forattini-dev/moleculer-mixin-aws-sqs#readme",
