@@ -57,7 +57,7 @@ module.exports = {
       },
     } = this.settings;
     
-    for (const [key, value] of this.schema.queues) {
+    for (const [key, value] of Object.entries(this.schema.queues)) {
       this.activeQueues[key] = []
 
       for (let i = 0; i < Math.ceil(prefetch); i++) {
@@ -86,7 +86,7 @@ module.exports = {
       params: {
         queue: "string",
         body: "string",
-        options: "object",
+        options: "object|optional",
       },
 
       async handler(ctx) {
